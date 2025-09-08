@@ -800,7 +800,10 @@ export class DhiwayAdapter implements IWalletAdapterWithOtp {
       }
 
       // Get watcher record and user
-      const watcherAndUser = await this.getWatcherAndUser(data.recordPublicId, data.userId);
+      const watcherAndUser = await this.getWatcherAndUser(
+        data.recordPublicId,
+        data.userId,
+      );
       if (!watcherAndUser.success) {
         return watcherAndUser.error!;
       }
@@ -839,7 +842,10 @@ export class DhiwayAdapter implements IWalletAdapterWithOtp {
       await this.updateDatabaseVC(data.recordPublicId, user.id, vcContent);
 
       // Return success response
-      return this.createSuccessResponse(data.recordPublicId, walletUpdateResult.data);
+      return this.createSuccessResponse(
+        data.recordPublicId,
+        walletUpdateResult.data,
+      );
     } catch (error: unknown) {
       return this.handleCallbackError(error);
     }
@@ -847,7 +853,12 @@ export class DhiwayAdapter implements IWalletAdapterWithOtp {
 
   private validateCallbackData(data: any): {
     isValid: boolean;
-    error?: { success: boolean; message: string; statusCode: number; data?: any };
+    error?: {
+      success: boolean;
+      message: string;
+      statusCode: number;
+      data?: any;
+    };
   } {
     if (!data.recordPublicId) {
       return {
@@ -868,10 +879,15 @@ export class DhiwayAdapter implements IWalletAdapterWithOtp {
   ): Promise<{
     success: boolean;
     data?: { user: any };
-    error?: { success: boolean; message: string; statusCode: number; data?: any };
+    error?: {
+      success: boolean;
+      message: string;
+      statusCode: number;
+      data?: any;
+    };
   }> {
     const watcherRecord = await this.walletVCWatcherRepository.findOne({
-      where: { vcPublicId: recordPublicId, userId: user_id},
+      where: { vcPublicId: recordPublicId, userId: user_id },
     });
 
     if (!watcherRecord) {
@@ -917,7 +933,12 @@ export class DhiwayAdapter implements IWalletAdapterWithOtp {
   private async getVCContent(recordPublicId: string): Promise<{
     success: boolean;
     data?: Record<string, unknown>;
-    error?: { success: boolean; message: string; statusCode: number; data?: any };
+    error?: {
+      success: boolean;
+      message: string;
+      statusCode: number;
+      data?: any;
+    };
   }> {
     try {
       const vcResponse = await axios.get(
@@ -961,10 +982,18 @@ export class DhiwayAdapter implements IWalletAdapterWithOtp {
   ): Promise<{
     success: boolean;
     data?: any;
-    error?: { success: boolean; message: string; statusCode: number; data?: any };
+    error?: {
+      success: boolean;
+      message: string;
+      statusCode: number;
+      data?: any;
+    };
   }> {
     const messagePayload = this.formatMessagePayload({
-      id: typeof vcContent.id === 'string' ? vcContent.id : `vc-${recordPublicId}`,
+      id:
+        typeof vcContent.id === 'string'
+          ? vcContent.id
+          : `vc-${recordPublicId}`,
       fromDid: user.did,
       toDid: user.did,
       document: 'string',

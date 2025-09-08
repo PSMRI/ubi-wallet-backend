@@ -1,0 +1,985 @@
+{
+  "info": {
+    "name": "UBI Wallet Backend API",
+    "description": "A comprehensive NestJS-based backend service for managing digital wallets with Dhiway integration, Verifiable Credentials (VC) management, and advanced wallet operations including VC watching and callback processing.",
+    "version": "1.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "WALLET_API_URL",
+      "value": "http://localhost:3018",
+      "type": "string"
+    },
+    {
+      "key": "WALLET_USERNAME",
+      "value": "{{WALLET_USERNAME}}",
+      "type": "string"
+    },
+    {
+      "key": "WALLET_USER_TOKEN",
+      "value": "b2462e67-860d-44a0-b56a-74b3f09ce611",
+      "type": "string"
+    },
+    {
+      "key": "WALLET_VC_ID",
+      "value": "{{WALLET_VC_ID}}",
+      "type": "string"
+    },
+    {
+      "key": "WALLET_VC_IDENTIFIER",
+      "value": "stmt:cord:s3ewdyJWgzr3CGpf4A3jM8xtA8VBiLqNMS3cfKJzRsqyobBPo",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "System",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{WALLET_API_URL}}/",
+              "host": ["{{WALLET_API_URL}}"],
+              "path": [""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Housekeeping Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer YOUR_TOKEN_HERE",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{WALLET_API_URL}}/housekeeping/stats",
+              "host": ["{{WALLET_API_URL}}"],
+              "path": ["housekeeping", "stats"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add Watchers for Missing VCs",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer YOUR_TOKEN_HERE",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"chunkSize\": 100\n}"
+            },
+            "url": {
+              "raw": "{{WALLET_API_URL}}/housekeeping/add-watchers",
+              "host": ["{{WALLET_API_URL}}"],
+              "path": ["housekeeping", "add-watchers"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Onboard User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"username\": \"johndoe\",\n  \"password\": \"SecurePass123!\",\n  \"email\": \"john.doe@example.com\",\n  \"phone\": \"+1234567890\",\n  \"externalUserId\": \"ext_user_123\"\n}"
+            },
+            "url": {
+              "raw": "{{WALLET_API_URL}}/api/wallet/onboard",
+              "host": ["{{WALLET_API_URL}}"],
+              "path": ["api", "wallet", "onboard"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json, text/plain, */*",
+                "type": "text"
+              },
+              {
+                "key": "Accept-Language",
+                "value": "en-GB,en-US;q=0.9,en;q=0.8",
+                "type": "text"
+              },
+              {
+                "key": "Connection",
+                "value": "keep-alive",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Origin",
+                "value": "http://localhost:1234",
+                "type": "text"
+              },
+              {
+                "key": "Referer",
+                "value": "http://localhost:1234/",
+                "type": "text"
+              },
+              {
+                "key": "Sec-Fetch-Dest",
+                "value": "empty",
+                "type": "text"
+              },
+              {
+                "key": "Sec-Fetch-Mode",
+                "value": "cors",
+                "type": "text"
+              },
+              {
+                "key": "Sec-Fetch-Site",
+                "value": "same-site",
+                "type": "text"
+              },
+              {
+                "key": "User-Agent",
+                "value": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+                "type": "text"
+              },
+              {
+                "key": "sec-ch-ua",
+                "value": "\"Not;A=Brand\";v=\"99\", \"Google Chrome\";v=\"139\", \"Chromium\";v=\"139\"",
+                "type": "text"
+              },
+              {
+                "key": "sec-ch-ua-mobile",
+                "value": "?0",
+                "type": "text"
+              },
+              {
+                "key": "sec-ch-ua-platform",
+                "value": "\"Linux\"",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{WALLET_USERNAME}}\",\n  \"password\": \"Password@01\"\n}"
+            },
+            "url": {
+              "raw": "{{WALLET_API_URL}}/api/wallet/login",
+              "host": ["{{WALLET_API_URL}}"],
+              "path": ["api", "wallet", "login"]
+            }
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"username\": \"ankush_m_8435\",\n  \"password\": \"Password@01\"\n}"
+                },
+                "url": {
+                  "raw": "{{WALLET_API_URL}}/api/wallet/login",
+                  "host": ["{{WALLET_API_URL}}"],
+                  "path": ["api", "wallet", "login"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"statusCode\": 200,\n    \"message\": \"Login successful\",\n    \"data\": {\n        \"token\": \"b2462e67-860d-44a0-b56a-74b3f09ce611\",\n        \"accountId\": \"{{WALLET_USERNAME}}\",\n        \"user\": {\n            \"id\": \"0f37a0ca-f1d9-4758-8b65-fe0102c1958b\",\n            \"firstName\": \"pa\",\n            \"lastName\": \"kataria\",\n            \"username\": \"{{WALLET_USERNAME}}\"\n        }\n    }\n}"
+            },
+            {
+              "name": "Failed Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"username\": \"invalid_user\",\n  \"password\": \"wrong_password\"\n}"
+                },
+                "url": {
+                  "raw": "{{WALLET_API_URL}}/api/wallet/login",
+                  "host": ["{{WALLET_API_URL}}"],
+                  "path": ["api", "wallet", "login"]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"statusCode\": 401,\n    \"message\": \"Invalid credentials\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Verify Login OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sessionId\": \"session_123456\",\n  \"otp\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{WALLET_API_URL}}/api/wallet/login/verify",
+              "host": ["{{WALLET_API_URL}}"],
+              "path": ["api", "wallet", "login", "verify"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Resend OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sessionId\": \"session_123456\"\n}"
+            },
+            "url": {
+              "raw": "{{WALLET_API_URL}}/api/wallet/login/resend-otp",
+              "host": ["{{WALLET_API_URL}}"],
+              "path": ["api", "wallet", "login", "resend-otp"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Wallet Operations",
+      "item": [
+        {
+          "name": "Get All VCs",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json, text/plain, */*",
+                "type": "text"
+              },
+              {
+                "key": "Accept-Language",
+                "value": "en-GB,en-US;q=0.9,en;q=0.8",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{WALLET_USER_TOKEN}}",
+                "type": "text"
+              },
+              {
+                "key": "Connection",
+                "value": "keep-alive",
+                "type": "text"
+              },
+              {
+                "key": "If-None-Match",
+                "value": "W/\"140-dHkoP93F6pMx6/IjEgWUPQNbjHE\"",
+                "type": "text"
+              },
+              {
+                "key": "Origin",
+                "value": "http://localhost:1234",
+                "type": "text"
+              },
+              {
+                "key": "Referer",
+                "value": "http://localhost:1234/",
+                "type": "text"
+              },
+              {
+                "key": "Sec-Fetch-Dest",
+                "value": "empty",
+                "type": "text"
+              },
+              {
+                "key": "Sec-Fetch-Mode",
+                "value": "cors",
+                "type": "text"
+              },
+              {
+                "key": "Sec-Fetch-Site",
+                "value": "same-site",
+                "type": "text"
+              },
+              {
+                "key": "User-Agent",
+                "value": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+                "type": "text"
+              },
+              {
+                "key": "sec-ch-ua",
+                "value": "\"Not;A=Brand\";v=\"99\", \"Google Chrome\";v=\"139\", \"Chromium\";v=\"139\"",
+                "type": "text"
+              },
+              {
+                "key": "sec-ch-ua-mobile",
+                "value": "?0",
+                "type": "text"
+              },
+              {
+                "key": "sec-ch-ua-platform",
+                "value": "\"Linux\"",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{WALLET_API_URL}}/api/wallet/{{WALLET_USERNAME}}/vcs",
+              "host": ["{{WALLET_API_URL}}"],
+              "path": ["api", "wallet", "{{WALLET_USERNAME}}", "vcs"]
+            }
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{WALLET_USER_TOKEN}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{WALLET_API_URL}}/api/wallet/{{WALLET_USERNAME}}/vcs",
+                  "host": ["{{WALLET_API_URL}}"],
+                  "path": ["api", "wallet", "{{WALLET_USERNAME}}", "vcs"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"statusCode\": 200,\n    \"message\": \"VCs retrieved successfully\",\n    \"data\": [\n        {\n            \"id\": \"{{WALLET_VC_ID}}\",\n            \"identifier\": \"stmt:cord:s3ewdyJWgzr3CGpf4A3jM8xtA8VBiLqNMS3cfKJzRsqyobBPo\",\n            \"name\": \"Bank Account\",\n            \"active\": true,\n            \"issuedAt\": \"2025-09-01T13:00:23.943Z\",\n            \"expiresAt\": \"2026-08-20T10:23:57.245Z\",\n            \"documentTitle\": \"\"\n        }\n    ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get VC by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json, text/plain, */*",
+                "type": "text"
+              },
+              {
+                "key": "Accept-Language",
+                "value": "en-GB,en-US;q=0.9,en;q=0.8",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{WALLET_USER_TOKEN}}",
+                "type": "text"
+              },
+              {
+                "key": "Connection",
+                "value": "keep-alive",
+                "type": "text"
+              },
+              {
+                "key": "Origin",
+                "value": "http://localhost:1234",
+                "type": "text"
+              },
+              {
+                "key": "Referer",
+                "value": "http://localhost:1234/",
+                "type": "text"
+              },
+              {
+                "key": "Sec-Fetch-Dest",
+                "value": "empty",
+                "type": "text"
+              },
+              {
+                "key": "Sec-Fetch-Mode",
+                "value": "cors",
+                "type": "text"
+              },
+              {
+                "key": "Sec-Fetch-Site",
+                "value": "same-site",
+                "type": "text"
+              },
+              {
+                "key": "User-Agent",
+                "value": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+                "type": "text"
+              },
+              {
+                "key": "sec-ch-ua",
+                "value": "\"Not;A=Brand\";v=\"99\", \"Google Chrome\";v=\"139\", \"Chromium\";v=\"139\"",
+                "type": "text"
+              },
+              {
+                "key": "sec-ch-ua-mobile",
+                "value": "?0",
+                "type": "text"
+              },
+              {
+                "key": "sec-ch-ua-platform",
+                "value": "\"Linux\"",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{WALLET_API_URL}}/api/wallet/{{WALLET_USERNAME}}/vcs/{{WALLET_VC_ID}}",
+              "host": ["{{WALLET_API_URL}}"],
+              "path": ["api", "wallet", "{{WALLET_USERNAME}}", "vcs", "{{WALLET_VC_ID}}"]
+            }
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{WALLET_USER_TOKEN}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{WALLET_API_URL}}/api/wallet/{{WALLET_USERNAME}}/vcs/{{WALLET_VC_ID}}",
+                  "host": ["{{WALLET_API_URL}}"],
+                  "path": ["api", "wallet", "{{WALLET_USERNAME}}", "vcs", "{{WALLET_VC_ID}}"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"statusCode\": 200,\n    \"message\": \"Successfully fetched the VC\",\n    \"data\": {\n        \"id\": \"{{WALLET_VC_ID}}\",\n        \"name\": \"Verifiable Credential\",\n        \"type\": \"Verifiable Credential\",\n        \"json\": \"{\\\"@context\\\":[\\\"https://www.w3.org/2018/credentials/v1\\\",\\\"https://cord.network/2023/cred/v1\\\"],\\\"type\\\":[\\\"VerifiableCredential\\\"],\\\"issuer\\\":\\\"did:cord:3y6YxHpmG3nysaT4GK7r1zeGAkvKAo15nMfEjAo7D254ZTh4\\\",\\\"issuanceDate\\\":\\\"2025-09-01T13:00:23.943Z\\\",\\\"credentialSubject\\\":{\\\"accountholdername\\\":\\\"20Aug0011122233\\\",\\\"accountnumber\\\":\\\"20Aug0011\\\",\\\"ifsccode\\\":\\\"20Aug0011\\\",\\\"bankname\\\":\\\"20Aug0011\\\",\\\"bankaddress\\\":\\\"20Aug0010\\\",\\\"branchcode\\\":\\\"20Aug0010\\\",\\\"issuedby\\\":\\\"20Aug0010\\\",\\\"issuerauthority\\\":\\\"20Aug0010\\\",\\\"issueddate\\\":\\\"Wed, 20 Aug 2025 00:00:00 GMT\\\",\\\"validupto\\\":\\\"Thu, 20 Aug 2026 00:00:00 GMT\\\",\\\"originalvc\\\":{\\\"encoding\\\":\\\"7bit\\\",\\\"hash\\\":\\\"694b56b5e779059a96b31c6dab44b22b33ed8aeb8cf48d9db2d4288b07649cdc\\\",\\\"mimetype\\\":\\\"image/jpeg\\\",\\\"originalname\\\":\\\"Bank.jfif\\\",\\\"size\\\":14141,\\\"url\\\":\\\"https://markstudio-test.s3.ap-south-1.amazonaws.com/apidata/record-content/913f2723-3a8c-4310-8a40-e03c95f5f2c9-Bank.jfif\\\"},\\\"id\\\":\\\"did:cord:3y6YxHpmG3nysaT4GK7r1zeGAkvKAo15nMfEjAo7D254ZTh4\\\",\\\"@context\\\":{\\\"vocab\\\":\\\"schema:cord:s369Bonmhy4TVR2qdeH3167kLku3kkr3ssvN8v6Goo6tKpyHP#\\\"}},\\\"validFrom\\\":\\\"2025-09-01T13:00:23.943Z\\\",\\\"validUntil\\\":\\\"2026-08-20T10:23:57.245Z\\\",\\\"metadata\\\":{},\\\"credentialSchema\\\":{\\\"$id\\\":\\\"schema:cord:s369Bonmhy4TVR2qdeH3167kLku3kkr3ssvN8v6Goo6tKpyHP\\\",\\\"title\\\":\\\"Bank Account:0f6e07d3-71ab-4985-a814-636f2cff6d5b\\\",\\\"description\\\":\\\"Bank account schema \\\",\\\"properties\\\":{\\\"accountholdername\\\":{\\\"type\\\":\\\"string\\\"},\\\"accountnumber\\\":{\\\"type\\\":\\\"string\\\"},\\\"ifsccode\\\":{\\\"type\\\":\\\"string\\\"},\\\"bankname\\\":{\\\"type\\\":\\\"string\\\"},\\\"bankaddress\\\":{\\\"type\\\":\\\"string\\\"},\\\"branchcode\\\":{\\\"type\\\":\\\"string\\\"},\\\"issuedby\\\":{\\\"type\\\":\\\"string\\\"},\\\"issuerauthority\\\":{\\\"type\\\":\\\"string\\\"},\\\"issueddate\\\":{\\\"type\\\":\\\"string\\\"},\\\"validupto\\\":{\\\"type\\\":\\\"string\\\"},\\\"originalvc\\\":{\\\"type\\\":\\\"object\\\"},\\\"originalvc1\\\":{\\\"type\\\":\\\"object\\\"},\\\"issuingauthorityaddress\\\":{\\\"type\\\":\\\"string\\\"},\\\"issuingauthoritydistrict\\\":{\\\"type\\\":\\\"string\\\"},\\\"issuingauthoritypin\\\":{\\\"type\\\":\\\"string\\\"},\\\"issuingauthoritystate\\\":{\\\"type\\\":\\\"string\\\"},\\\"issuingauthoritycountry\\\":{\\\"type\\\":\\\"string\\\"}},\\\"required\\\":[\\\"accountholdername\\\",\\\"accountnumber\\\",\\\"bankaddress\\\",\\\"bankname\\\",\\\"branchcode\\\",\\\"ifsccode\\\",\\\"issuedby\\\",\\\"issueddate\\\",\\\"issuerauthority\\\",\\\"originalvc\\\",\\\"validupto\\\"],\\\"type\\\":\\\"object\\\",\\\"additionalProperties\\\":false,\\\"$schema\\\":\\\"http://cord.network/draft-01/schema#\\\"},\\\"credentialHash\\\":\\\"0x1e64b9f95dd9dd99429bc9c293df2e738e8c00e9dbf2d7e915f81dd9bb049e15\\\",\\\"id\\\":\\\"stmt:cord:s3ewdyJWgzr3CGpf4A3jM8xtA8VBiLqNMS3cfKJzRsqyobBPo\\\",\\\"proof\\\":[{\\\"type\\\":\\\"Ed25519Signature2020\\\",\\\"created\\\":\\\"Mon Sep 01 2025 13:00:23 GMT+0000 (Coordinated Universal Time)\\\",\\\"proofPurpose\\\":\\\"sr25519\\\",\\\"verificationMethod\\\":\\\"did:cord:3y6YxHpmG3nysaT4GK7r1zeGAkvKAo15nMfEjAo7D254ZTh4#0x4f3a986d94477a22b88cd86b82c5391550ad7c24cfeca27a1e1ef26b87c2c324\\\",\\\"proofValue\\\":\\\"z5BJLwmeMLr13eYbXXpk2qmGARn3sQcwkUCPnf3uhhBQEcbd7VCiZjZr4P7aJLrg6TiiCuUodXjvkypFnD1Gzxgsp\\\"},{\\\"type\\\":\\\"CordProof2024\\\",\\\"elementUri\\\":\\\"stmt:cord:s3ewdyJWgzr3CGpf4A3jM8xtA8VBiLqNMS3cfKJzRsqyobBPo:1e64b9f95dd9dd99429bc9c293df2e738e8c00e9dbf2d7e915f81dd9bb049e15\\\",\\\"spaceUri\\\":\\\"space:cord:c36BVtThSzuW4cuS5B2ddxu4Zvn6tFmvoX3hs4APXm3Me4x2m\\\",\\\"creatorUri\\\":\\\"did:cord:3y6YxHpmG3nysaT4GK7r1zeGAkvKAo15nMfEjAo7D254ZTh4\\\",\\\"digest\\\":\\\"0x1e64b9f95dd9dd99429bc9c293df2e738e8c00e9dbf2d7e915f81dd9bb049e15\\\",\\\"identifier\\\":\\\"stmt:cord:s3ewdyJWgzr3CGpf4A3jM8xtA8VBiLqNMS3cfKJzRsqyobBPo\\\",\\\"genesisHash\\\":\\\"0x743115aca5f58453993db0b163772f35d086eafefe3b9bc30e304b76453e428a\\\"},{\\\"type\\\":\\\"CordSDRProof2024\\\",\\\"defaultDigest\\\":\\\"0x3be3ba898d1fd25f76e9afa331b6c870842e4444339d777a928ac5c0eb999411\\\",\\\"hashes\\\":[\\\"0x00e1f05f91f21ad2faf3b0552224372494ec9c86cb90537a86f72ab99b312277\\\",\\\"0x26dd5058b5ba8f2dfa09f6da2d59308818f7065c02893bde70b6435f28e9a4a4\\\",\\\"0x31fcedc241a8da7207db423de7f742d2157f72327021878318b1ed8a69fa47e1\\\",\\\"0x34eb068b8b04a9e76dd02835ee253d4354453351c8c9126e63f0016c979c7b69\\\",\\\"0x395c75552958aa99c980f671b656458273eef5f9c8c00b3cb998ba6b63ad3138\\\",\\\"0x3b0a4dc57e2f3b67f91c6bd10378657ad71df0b94ae7929ebb34c778233359c6\\\",\\\"0x3d3765fa331eb320d4d2780badf49d431669863bfcfc44cbc9271c03b0548f5f\\\",\\\"0x45d6dece16cc9dda6db2c6e7274d20ff4fb7c0c3911237f3420d98b22f193717\\\",\\\"0x4dea9561c7e022b3b8efdbbeb883a96a7aaea19c2662bdab11f75b7d22458876\\\",\\\"0x5402407272779ae6a385a26fe82874cde58a5f6298cc6a57a4f02c18e600f718\\\",\\\"0x870791010317b6e6fa40303f232be17cf9f09461107167db46b8eede502611e6\\\",\\\"0x93d5db939a98c8a13be2685de780ebb791b803c499bbfdb414c557ab71c4bccd\\\",\\\"0xa30703c7486469ea45668c63e0ddac0ea0bfb99ec9b66dc90dba7bcaa9ef54d0\\\",\\\"0xa3b8cc1ab813adae0879a2cd18ae96e1ffb9be269827d300edfb6c5c7db5cdd1\\\",\\\"0xbcb58088dd5bbf7b0b48238945a8410ae8a4690b37df34206a3c7cddf7ee1b5a\\\",\\\"0xc290c660263a24ec7c2763833162f0eefa66096a0c66172309b7b136853870bb\\\",\\\"0xd677b392cea9e85dcd4262974c01a4fa2df68b8b0600ee664d7cd21b05e96ca7\\\",\\\"0xfcf7976bb469f8526f80bea8e7fad7a30b6958a2c9d040abc470afec45a8cea4\\\"],\\\"nonceMap\\\":{\\\"0xd9783e26195ccb39d1f43781ae940c66f58d13d752fef4f1e2c01d48c8709502\\\":\\\"5d9b7f14-9fbd-4adb-b394-b7e52e42e11c\\\",\\\"0xfb0e293fc988d156499eb5ccebf9dfb3071d3499a02c59fdfe2494b5e390cd6b\\\":\\\"336cccaf-c701-4e4f-8852-617c3eb20567\\\",\\\"0x57bb9eb588415a9821b65662cef41dd0a6abf0133b563c624cb2add1bed71e02\\\":\\\"2bfc80ae-758f-4f48-9537-4f0773918dd6\\\",\\\"0x7b549cd06ab669f8043959ceec40b09c9c703f1df65b47463daafcfb1e52b1a3\\\":\\\"27a776ef-fbbd-49c3-98a1-58d54d8c7683\\\",\\\"0x59aa62de8380d14dcbd443e289ebbaef7cb60bb10eff870fb0920412e26ad78c\\\":\\\"a831435f-33de-4aac-832e-2d6223e1c119\\\",\\\"0xa304d861cac99274675e52ad02b68964240739fe3325f8b0c41c0ffed5bf2f1b\\\":\\\"32aac0da-6fb8-4787-abe6-4dc67c1a8b09\\\",\\\"0xcad13918c14c0c0339302200b1b379207840699334a38da8d42bb02b4a6a8633\\\":\\\"eff96513-36fe-4c48-b801-6e81d7ed4b16\\\",\\\"0x467dcd252067a5181d65af3f0107e8a018f4712414f8e5707d23b619adee0787\\\":\\\"8fe02655-1387-46fb-bae2-b5b7cf638731\\\",\\\"0xd7f9e6928e95b0c89fe438c38958483a323c4eaf1039c49c7ecc267481af6566\\\":\\\"1ec8a80e-cdef-4221-9d45-94ab72a17afb\\\",\\\"0x7a44b2c66e39eabe7754fbedc4eb17d5e32d4413d5a7bdd52b73baaa00593d16\\\":\\\"28459e03-55e5-4b9d-a3fb-b20398137e07\\\",\\\"0x7ecd83ba24f514045ca5426f3107527aff0c68fde6f24e75b7daf0064b4550b0\\\":\\\"c1c86c4b-b86c-4c1a-a3b0-d66749fd1479\\\",\\\"0x22c31ca3b75c12225c555493303e3478bf91a71f5aa3ac736c4d768bce1a9c2d\\\":\\\"079e6223-0b21-4ba3-b246-009175d20eed\\\",\\\"0x4225a356fb0245b9c3c239cb3ca7204b4ce7ccc279ed5dc412141c1a979d036e\\\":\\\"e36af46f-ac9e-49b2-9451-ce283a02b947\\\",\\\"0x1d61f17933eee9e1e54b639ae8e68ce8c1ca6fd91b6334f785606f57b5de264d\\\":\\\"84bf54ab-1308-421d-b102-e50c0a478eaf\\\",\\\"0xa50d7542ddf48393e128eb7d36d73abfdac2f9d71d01bcd042eedf67eed12230\\\":\\\"01f30a23-0b57-4eb4-b04d-d1e33f7e5b84\\\",\\\"0x775c89ad4e40692107505d99f302e6999d44818cb815c867e0516503c2d837e2\\\":\\\"04de8c31-245f-42bb-8071-fc5d440bdc35\\\",\\\"0xb07db173ea5a30d6501c195967bffc741eb8ee5f1ddeb71b1188557ede3df913\\\":\\\"e66e3c40-2264-476e-8ce7-bbfbb37b49db\\\",\\\"0x31e62d2408b45b6fa7d258934c0729eb16e5101df241fd7d10cd4132845e5d2c\\\":\\\"8f014236-ecc5-4a18-be10-a2a0e53c332e\\\"},\\\"genesisHash\\\":\\\"0x743115aca5f58453993db0b163772f35d086eafefe3b9bc30e304b76453e428a\\\"}]}\",\n        \"credentialSubject\": {\n            \"accountholdername\": \"20Aug0011122233\",\n            \"accountnumber\": \"20Aug0011\",\n            \"ifsccode\": \"20Aug0011\",\n            \"bankname\": \"20Aug0011\",\n            \"bankaddress\": \"20Aug0010\",\n            \"branchcode\": \"20Aug0010\",\n            \"issuedby\": \"20Aug0010\",\n            \"issuerauthority\": \"20Aug0010\",\n            \"issueddate\": \"Wed, 20 Aug 2025 00:00:00 GMT\",\n            \"validupto\": \"Thu, 20 Aug 2026 00:00:00 GMT\",\n            \"originalvc\": {\n                \"encoding\": \"7bit\",\n                \"hash\": \"694b56b5e779059a96b31c6dab44b22b33ed8aeb8cf48d9db2d4288b07649cdc\",\n                \"mimetype\": \"image/jpeg\",\n                \"originalname\": \"Bank.jfif\",\n                \"size\": 14141,\n                \"url\": \"https://markstudio-test.s3.ap-south-1.amazonaws.com/apidata/record-content/913f2723-3a8c-4310-8a40-e03c95f5f2c9-Bank.jfif\"\n            },\n            \"id\": \"did:cord:3y6YxHpmG3nysaT4GK7r1zeGAkvKAo15nMfEjAo7D254ZTh4\",\n            \"@context\": {\n                \"vocab\": \"schema:cord:s369Bonmhy4TVR2qdeH3167kLku3kkr3ssvN8v6Goo6tKpyHP#\"\n            }\n        }\n    }\n}"
+            },
+            {
+              "name": "Error Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{WALLET_USER_TOKEN}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{WALLET_API_URL}}/api/wallet/{{WALLET_USERNAME}}/vcs/invalid-vc-id",
+                  "host": ["{{WALLET_API_URL}}"],
+                  "path": ["api", "wallet", "{{WALLET_USERNAME}}", "vcs", "invalid-vc-id"]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"statusCode\": 404,\n    \"message\": \"VC not found\",\n    \"error\": \"Not Found\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get VC JSON by Identifier",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json, text/plain, */*",
+                "type": "text"
+              },
+              {
+                "key": "Accept-Language",
+                "value": "en-GB,en-US;q=0.9,en;q=0.8",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{WALLET_USER_TOKEN}}",
+                "type": "text"
+              },
+              {
+                "key": "Connection",
+                "value": "keep-alive",
+                "type": "text"
+              },
+              {
+                "key": "Origin",
+                "value": "https://uba-dev-wallet.tekdinext.com",
+                "type": "text"
+              },
+              {
+                "key": "Referer",
+                "value": "https://uba-dev-wallet.tekdinext.com/",
+                "type": "text"
+              },
+              {
+                "key": "Sec-Fetch-Dest",
+                "value": "empty",
+                "type": "text"
+              },
+              {
+                "key": "Sec-Fetch-Mode",
+                "value": "cors",
+                "type": "text"
+              },
+              {
+                "key": "Sec-Fetch-Site",
+                "value": "same-site",
+                "type": "text"
+              },
+              {
+                "key": "User-Agent",
+                "value": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+                "type": "text"
+              },
+              {
+                "key": "sec-ch-ua",
+                "value": "\"Not;A=Brand\";v=\"99\", \"Google Chrome\";v=\"139\", \"Chromium\";v=\"139\"",
+                "type": "text"
+              },
+              {
+                "key": "sec-ch-ua-mobile",
+                "value": "?0",
+                "type": "text"
+              },
+              {
+                "key": "sec-ch-ua-platform",
+                "value": "\"Linux\"",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{WALLET_API_URL}}/api/wallet/{{WALLET_USERNAME}}/vc_json/{{WALLET_VC_IDENTIFIER}}",
+              "host": ["{{WALLET_API_URL}}"],
+              "path": ["api", "wallet", "{{WALLET_USERNAME}}", "vc_json", "{{WALLET_VC_IDENTIFIER}}"]
+            }
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{WALLET_USER_TOKEN}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{WALLET_API_URL}}/api/wallet/{{WALLET_USERNAME}}/vc_json/stmt:cord:s3ewdyJWgzr3CGpf4A3jM8xtA8VBiLqNMS3cfKJzRsqyobBPo",
+                  "host": ["{{WALLET_API_URL}}"],
+                  "path": ["api", "wallet", "{{WALLET_USERNAME}}", "vc_json", "stmt:cord:s3ewdyJWgzr3CGpf4A3jM8xtA8VBiLqNMS3cfKJzRsqyobBPo"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"data\": {\n        \"id\": \"depwd9e95cbc5-8d98-4e48-9095-16315abbd135\",\n        \"revoked\": false,\n        \"uniqueIdValue\": \"-\",\n        \"edited\": true,\n        \"revokedForEdit\": false,\n        \"reason\": \"-\",\n        \"title\": \"73a263f1-e45b-4d16-bca3-2420684fc6ca\",\n        \"identifier\": \"stmt:cord:s3ewdyJWgzr3CGpf4A3jM8xtA8VBiLqNMS3cfKJzRsqyobBPo:1e64b9f95dd9dd99429bc9c293df2e738e8c00e9dbf2d7e915f81dd9bb049e15\",\n        \"hash\": \"0x1e64b9f95dd9dd99429bc9c293df2e738e8c00e9dbf2d7e915f81dd9bb049e15\",\n        \"pdf_hash\": \"\",\n        \"signature\": \"0x4a488f18d62fadedadaa1d1a39156fd58899f2e28971340896155a6150e6fb6e22f1ce2a6d2edeaf92fb7171944120b323b175be514af33f8c37a15592351483\",\n        \"publicId\": \"73a263f1-e45b-4d16-bca3-2420684fc6ca\",\n        \"hashmarkDesign\": \"Frameless\",\n        \"endDate\": null,\n        \"anchorTime\": \"2025-08-20T10:23:57.235Z\",\n        \"template\": \"t2b8f8286-486c-4f0a-97c1-2259a029940d\",\n        \"tags\": \"[]\",\n        \"viewCount\": 7,\n        \"downloadCount\": 0,\n        \"blockHash\": \"0xeabf2dac620df0c2fc58408e072c8b17036fe3823083e38c1ef70af0e1fd7378\",\n        \"revokeBlockHash\": \"-\",\n        \"active\": true,\n        \"latest\": true,\n        \"v3\": true,\n        \"ready\": true,\n        \"attachments\": 1,\n        \"name\": \"73a263f1-e45b-4d16-bca3-2420684fc6ca.json\",\n        \"storeData\": true,\n        \"sentEmail\": false,\n        \"imageUrl\": \"https://print.depwd.onest.dhiway.net/record/image/73a263f1-e45b-4d16-bca3-2420684fc6ca\",\n        \"content\": {\n            \"accountholdername\": \"20Aug0011122233\",\n            \"accountnumber\": \"20Aug0011\",\n            \"bankaddress\": \"20Aug0010\",\n            \"bankname\": \"20Aug0011\",\n            \"branchcode\": \"20Aug0010\",\n            \"ifsccode\": \"20Aug0011\",\n            \"issuedby\": \"20Aug0010\",\n            \"issueddate\": \"Wed, 20 Aug 2025 00:00:00 GMT\",\n            \"issuerauthority\": \"20Aug0010\",\n            \"originalvc\": {\n                \"encoding\": \"7bit\",\n                \"hash\": \"694b56b5e779059a96b31c6dab44b22b33ed8aeb8cf48d9db2d4288b07649cdc\",\n                \"mimetype\": \"image/jpeg\",\n                \"originalname\": \"Bank.jfif\",\n                \"size\": 14141,\n                \"url\": \"https://markstudio-test.s3.ap-south-1.amazonaws.com/apidata/record-content/913f2723-3a8c-4310-8a40-e03c95f5f2c9-Bank.jfif\"\n            },\n            \"validupto\": \"Thu, 20 Aug 2026 00:00:00 GMT\",\n            \"wallet_link\": \"cord://issuevc/oc5e2232b-b0dc-43e7-88fb-809814d9c41b/73a263f1-e45b-4d16-bca3-2420684fc6ca\"\n        }\n    },\n    \"message\": \"VC JSON retrieved successfully from database\",\n    \"statusCode\": 200\n}"
+            }
+          ]
+        },
+        {
+          "name": "Upload VC from QR",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json, text/plain, */*",
+                "type": "text"
+              },
+              {
+                "key": "Accept-Language",
+                "value": "en-GB,en-US;q=0.9,en;q=0.8",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{WALLET_USER_TOKEN}}",
+                "type": "text"
+              },
+              {
+                "key": "Connection",
+                "value": "keep-alive",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Origin",
+                "value": "http://localhost:1234",
+                "type": "text"
+              },
+              {
+                "key": "Referer",
+                "value": "http://localhost:1234/",
+                "type": "text"
+              },
+              {
+                "key": "Sec-Fetch-Dest",
+                "value": "empty",
+                "type": "text"
+              },
+              {
+                "key": "Sec-Fetch-Mode",
+                "value": "cors",
+                "type": "text"
+              },
+              {
+                "key": "Sec-Fetch-Site",
+                "value": "same-site",
+                "type": "text"
+              },
+              {
+                "key": "User-Agent",
+                "value": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+                "type": "text"
+              },
+              {
+                "key": "sec-ch-ua",
+                "value": "\"Not;A=Brand\";v=\"99\", \"Google Chrome\";v=\"139\", \"Chromium\";v=\"139\"",
+                "type": "text"
+              },
+              {
+                "key": "sec-ch-ua-mobile",
+                "value": "?0",
+                "type": "text"
+              },
+              {
+                "key": "sec-ch-ua-platform",
+                "value": "\"Linux\"",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"qrData\": \"https://dway.io/depwd/73a263f1-e45b-4d16-bca3-2420684fc6ca\"\n}"
+            },
+            "url": {
+              "raw": "{{WALLET_API_URL}}/api/wallet/{{WALLET_USERNAME}}/vcs/upload-qr",
+              "host": ["{{WALLET_API_URL}}"],
+              "path": ["api", "wallet", "{{WALLET_USERNAME}}", "vcs", "upload-qr"]
+            }
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{WALLET_USER_TOKEN}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"qrData\": \"https://dway.io/depwd/73a263f1-e45b-4d16-bca3-2420684fc6ca\"\n}"
+                },
+                "url": {
+                  "raw": "{{WALLET_API_URL}}/api/wallet/{{WALLET_USERNAME}}/vcs/upload-qr",
+                  "host": ["{{WALLET_API_URL}}"],
+                  "path": ["api", "wallet", "{{WALLET_USERNAME}}", "vcs", "upload-qr"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"statusCode\": 200,\n    \"message\": \"VC uploaded successfully from QR\",\n    \"data\": {\n        \"status\": \"success\",\n        \"vcId\": \"vc-uploaded\",\n        \"vcJson\": {\n            \"id\": \"depwd9e95cbc5-8d98-4e48-9095-16315abbd135\",\n            \"revoked\": false,\n            \"uniqueIdValue\": \"-\",\n            \"edited\": true,\n            \"revokedForEdit\": false,\n            \"reason\": \"-\",\n            \"title\": \"73a263f1-e45b-4d16-bca3-2420684fc6ca\",\n            \"identifier\": \"stmt:cord:s3ewdyJWgzr3CGpf4A3jM8xtA8VBiLqNMS3cfKJzRsqyobBPo:1e64b9f95dd9dd99429bc9c293df2e738e8c00e9dbf2d7e915f81dd9bb049e15\",\n            \"hash\": \"0x1e64b9f95dd9dd99429bc9c293df2e738e8c00e9dbf2d7e915f81dd9bb049e15\",\n            \"pdf_hash\": \"\",\n            \"signature\": \"0x4a488f18d62fadedadaa1d1a39156fd58899f2e28971340896155a6150e6fb6e22f1ce2a6d2edeaf92fb7171944120b323b175be514af33f8c37a15592351483\",\n            \"publicId\": \"73a263f1-e45b-4d16-bca3-2420684fc6ca\",\n            \"hashmarkDesign\": \"Frameless\",\n            \"endDate\": null,\n            \"anchorTime\": \"2025-08-20T10:23:57.235Z\",\n            \"template\": \"t2b8f8286-486c-4f0a-97c1-2259a029940d\",\n            \"tags\": \"[]\",\n            \"viewCount\": 10,\n            \"downloadCount\": 0,\n            \"blockHash\": \"0xeabf2dac620df0c2fc58408e072c8b17036fe3823083e38c1ef70af0e1fd7378\",\n            \"revokeBlockHash\": \"-\",\n            \"active\": true,\n            \"latest\": true,\n            \"v3\": true,\n            \"ready\": true,\n            \"attachments\": 1,\n            \"name\": \"73a263f1-e45b-4d16-bca3-2420684fc6ca.json\",\n            \"storeData\": true,\n            \"sentEmail\": false,\n            \"imageUrl\": \"https://print.depwd.onest.dhiway.net/record/image/73a263f1-e45b-4d16-bca3-2420684fc6ca\",\n            \"content\": {\n                \"accountholdername\": \"20Aug0011122233\",\n                \"accountnumber\": \"20Aug0011\",\n                \"bankaddress\": \"20Aug0010\",\n                \"bankname\": \"20Aug0011\",\n                \"branchcode\": \"20Aug0010\",\n                \"ifsccode\": \"20Aug0011\",\n                \"issuedby\": \"20Aug0010\",\n                \"issueddate\": \"Wed, 20 Aug 2025 00:00:00 GMT\",\n                \"issuerauthority\": \"20Aug0010\",\n                \"originalvc\": {\n                    \"encoding\": \"7bit\",\n                    \"hash\": \"694b56b5e779059a96b31c6dab44b22b33ed8aeb8cf48d9db2d4288b07649cdc\",\n                    \"mimetype\": \"image/jpeg\",\n                    \"originalname\": \"Bank.jfif\",\n                    \"size\": 14141,\n                    \"url\": \"https://markstudio-test.s3.ap-south-1.amazonaws.com/apidata/record-content/913f2723-3a8c-4310-8a40-e03c95f5f2c9-Bank.jfif\"\n                },\n                \"validupto\": \"Thu, 20 Aug 2026 00:00:00 GMT\",\n                \"wallet_link\": \"cord://issuevc/oc5e2232b-b0dc-43e7-88fb-809814d9c41b/73a263f1-e45b-4d16-bca3-2420684fc6ca\"\n            }\n        }\n    }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "VC Watching",
+      "item": [
+        {
+          "name": "Watch VC",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer YOUR_TOKEN_HERE",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vcPublicId\": \"abc123\",\n  \"identifier\": \"vc_identifier_123\",\n  \"email\": \"watcher@example.com\",\n  \"callbackUrl\": \"https://your-app.com/callback\",\n  \"forwardWatcherCallbackUrl\": \"https://external-service.com/webhook\"\n}"
+            },
+            "url": {
+              "raw": "{{WALLET_API_URL}}/api/wallet/vcs/watch",
+              "host": ["{{WALLET_API_URL}}"],
+              "path": ["api", "wallet", "vcs", "watch"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "VC Watch Callback (Webhook)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"recordPublicId\": \"abc123\",\n  \"user_id\": \"user_123\",\n  \"status\": \"updated\",\n  \"timestamp\": \"2023-12-01T12:00:00Z\",\n  \"identifier\": \"vc_identifier_123\",\n  \"type\": \"vc_updated\",\n  \"message\": \"VC has been updated successfully\"\n}"
+            },
+            "url": {
+              "raw": "{{WALLET_API_URL}}/api/wallet/vcs/watch/callback",
+              "host": ["{{WALLET_API_URL}}"],
+              "path": ["api", "wallet", "vcs", "watch", "callback"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Housekeeping (Protected)",
+      "item": [
+        {
+          "name": "Get Stats (Protected)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer YOUR_SECRET_KEY_HERE",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{WALLET_API_URL}}/housekeeping/stats",
+              "host": ["{{WALLET_API_URL}}"],
+              "path": ["housekeeping", "stats"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add Watchers (Protected)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer YOUR_SECRET_KEY_HERE",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"chunkSize\": 100\n}"
+            },
+            "url": {
+              "raw": "{{WALLET_API_URL}}/housekeeping/add-watchers?chunkSize=100",
+              "host": ["{{WALLET_API_URL}}"],
+              "path": ["housekeeping", "add-watchers"],
+              "query": [
+                {
+                  "key": "chunkSize",
+                  "value": "100"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Sync VCs and Add Watchers (Protected)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer YOUR_SECRET_KEY_HERE",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{WALLET_API_URL}}/housekeeping/sync-vcs-and-add-watchers?provider=dhiway&chunkSize=100",
+              "host": ["{{WALLET_API_URL}}"],
+              "path": ["housekeeping", "sync-vcs-and-add-watchers"],
+              "query": [
+                {
+                  "key": "provider",
+                  "value": "dhiway"
+                },
+                {
+                  "key": "chunkSize",
+                  "value": "100"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Auto-set token from login response",
+          "if (pm.response && pm.response.json() && pm.response.json().data && pm.response.json().data.token) {",
+          "    pm.collectionVariables.set('token', pm.response.json().data.token);",
+          "}"
+        ]
+      }
+    }
+  ]
+}

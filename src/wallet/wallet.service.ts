@@ -557,8 +557,11 @@ export class WalletService {
     }
 
     try {
-      const response = await this.forwardCallbackToExternalUrl(callbackUrl, data);
-      
+      const response = await this.forwardCallbackToExternalUrl(
+        callbackUrl,
+        data,
+      );
+
       if (response.success) {
         this.logger.log(
           `Successfully forwarded callback to: ${callbackUrl}`,
@@ -612,7 +615,8 @@ export class WalletService {
         userId: watcher?.userId,
       };
 
-      const adapterResult = await this.walletAdapter.processCallback(adapterData);
+      const adapterResult =
+        await this.walletAdapter.processCallback(adapterData);
 
       if (adapterResult.success) {
         this.logger.log(
@@ -654,18 +658,15 @@ export class WalletService {
     };
   }
 
-  private createSuccessResponse(
-    recordPublicId: string,
-    callbackResults: any,
-  ) {
-    const { 
-      forwardedCallbacks, 
-      failedCallbacks, 
-      walletProcessedCallbacks, 
+  private createSuccessResponse(recordPublicId: string, callbackResults: any) {
+    const {
+      forwardedCallbacks,
+      failedCallbacks,
+      walletProcessedCallbacks,
       walletFailedCallbacks,
-      totalWatchers 
+      totalWatchers,
     } = callbackResults;
-    
+
     const totalProcessed = forwardedCallbacks + walletProcessedCallbacks;
 
     const message = `Watch callback processed successfully. External forwarded: ${forwardedCallbacks}, Wallet processed: ${walletProcessedCallbacks}, External failed: ${failedCallbacks}, Wallet failed: ${walletFailedCallbacks}, Total watchers: ${totalWatchers}`;
