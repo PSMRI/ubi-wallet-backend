@@ -316,7 +316,9 @@ export class HousekeepingService {
   }
 
   private async createAdapter(provider: string) {
-    const { getAdapterBasedOnEnv } = await import('../adapters/adapter.factory');
+    const { getAdapterBasedOnEnv } = await import(
+      '../adapters/adapter.factory'
+    );
     const AdapterClass = getAdapterBasedOnEnv(provider);
     return new AdapterClass(
       this.logger,
@@ -428,11 +430,11 @@ export class HousekeepingService {
         `${process.env.DHIWAY_API_BASE}/api/v1/cred`,
         {
           headers: {
-            'Authorization': `Bearer ${user.token}`,
+            Authorization: `Bearer ${user.token}`,
             'Content-Type': 'application/json',
           },
           timeout: 30000,
-        }
+        },
       );
 
       if (credentialsResponse.status !== 200) {
@@ -458,14 +460,14 @@ export class HousekeepingService {
             // Fetch complete VC JSON using the .json endpoint
             const vcResponse = await axios.get(
               `${process.env.DHIWAY_VC_ISSUER_GET_VC_BASE_URI}/${vc.publicId}.json`,
-              { timeout: 10000 }
+              { timeout: 10000 },
             );
 
             if (vcResponse.status === 200 && vcResponse.data) {
               // Add the publicId to the VC data for reference
               const completeVCData = {
                 ...vcResponse.data,
-                publicId: vc.publicId
+                publicId: vc.publicId,
               };
               completeVCs.push(completeVCData);
             } else {
@@ -505,7 +507,12 @@ export class HousekeepingService {
     }
   }
 
-  private async processVCsForUser(vcsFromProvider: any[], user: any, stats: any, provider: string) {
+  private async processVCsForUser(
+    vcsFromProvider: any[],
+    user: any,
+    stats: any,
+    provider: string,
+  ) {
     for (const vcFromProvider of vcsFromProvider) {
       try {
         await this.processSingleVC(vcFromProvider, user, stats, provider);
@@ -520,12 +527,22 @@ export class HousekeepingService {
     }
   }
 
-  private async processSingleVC(vcFromProvider: any, user: any, stats: any, provider: string) {
+  private async processSingleVC(
+    vcFromProvider: any,
+    user: any,
+    stats: any,
+    provider: string,
+  ) {
     await this.handleVCExistence(vcFromProvider, user, stats, provider);
     await this.handleWatcherExistence(vcFromProvider, user, stats, provider);
   }
 
-  private async handleVCExistence(vcFromProvider: any, user: any, stats: any, provider: string) {
+  private async handleVCExistence(
+    vcFromProvider: any,
+    user: any,
+    stats: any,
+    provider: string,
+  ) {
     const existingVC = await this.walletVCRepository.findOne({
       where: { vcPublicId: vcFromProvider.publicId, userId: user.id },
     });
@@ -559,7 +576,12 @@ export class HousekeepingService {
     );
   }
 
-  private async handleWatcherExistence(vcFromProvider: any, user: any, stats: any, provider: string) {
+  private async handleWatcherExistence(
+    vcFromProvider: any,
+    user: any,
+    stats: any,
+    provider: string,
+  ) {
     const existingWatcher = await this.walletVCWatcherRepository.findOne({
       where: { vcPublicId: vcFromProvider.publicId },
     });
@@ -576,7 +598,11 @@ export class HousekeepingService {
     }
   }
 
-  private async createNewWatcher(vcFromProvider: any, user: any, provider: string) {
+  private async createNewWatcher(
+    vcFromProvider: any,
+    user: any,
+    provider: string,
+  ) {
     const newWatcher = this.walletVCWatcherRepository.create({
       vcPublicId: vcFromProvider.publicId,
       userId: user.id,

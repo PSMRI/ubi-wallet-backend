@@ -1,0 +1,490 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<swagger xmlns="http://swagger.io/schema/swagger" version="2.0">
+  <info>
+    <title>UBI Wallet Backend API</title>
+    <version>1.0.0</version>
+    <description>A comprehensive NestJS-based backend service for managing digital wallets with Dhiway integration, Verifiable Credentials (VC) management, and advanced wallet operations including VC watching and callback processing.</description>
+  </info>
+  <host>localhost:3018</host>
+  <basePath>/</basePath>
+  <schemes>
+    <scheme>http</scheme>
+  </schemes>
+  <paths>
+    <path path="/">
+      <get>
+        <summary>Health Check</summary>
+        <description>Check if the application is running</description>
+        <operationId>healthCheck</operationId>
+        <produces>
+          <produce>application/json</produce>
+        </produces>
+        <responses>
+          <response code="200">
+            <description>Application is healthy</description>
+          </response>
+        </responses>
+      </get>
+    </path>
+    <path path="/housekeeping/stats">
+      <get>
+        <summary>Get Stats (Protected)</summary>
+        <description>Retrieve statistics about VC watchers and system health</description>
+        <operationId>getHousekeepingStats</operationId>
+        <produces>
+          <produce>application/json</produce>
+        </produces>
+        <security>
+          <securityRequirement>
+            <requirement name="Bearer"/>
+          </securityRequirement>
+        </security>
+        <responses>
+          <response code="200">
+            <description>Statistics retrieved successfully</description>
+          </response>
+          <response code="401">
+            <description>Unauthorized</description>
+          </response>
+        </responses>
+      </get>
+    </path>
+    <path path="/housekeeping/add-watchers">
+      <post>
+        <summary>Add Watchers (Protected)</summary>
+        <description>Automatically add watchers for VCs that don't have watchers configured</description>
+        <operationId>addWatchersForMissingVCs</operationId>
+        <consumes>
+          <consume>application/json</consume>
+        </consumes>
+        <produces>
+          <produce>application/json</produce>
+        </produces>
+        <security>
+          <securityRequirement>
+            <requirement name="Bearer"/>
+          </securityRequirement>
+        </security>
+        <parameters>
+          <parameter name="chunkSize" in="query" required="false" type="integer" format="int32" description="Number of VCs to process in each batch" example="100"/>
+        </parameters>
+        <responses>
+          <response code="200">
+            <description>Watchers added successfully</description>
+          </response>
+          <response code="401">
+            <description>Unauthorized</description>
+          </response>
+        </responses>
+      </post>
+    </path>
+    <path path="/api/wallet/onboard">
+      <post>
+        <summary>Onboard User</summary>
+        <description>Creates a new user account in both the local database and Dhiway wallet service</description>
+        <operationId>onboardUser</operationId>
+        <consumes>
+          <consume>application/json</consume>
+        </consumes>
+        <produces>
+          <produce>application/json</produce>
+        </produces>
+        <parameters>
+          <parameter name="body" in="body" required="true" description="User onboarding data">
+            <schema>
+              <type>object</type>
+              <properties>
+                <property name="firstName" type="string" description="User's first name" example="John"/>
+                <property name="lastName" type="string" description="User's last name" example="Doe"/>
+                <property name="username" type="string" description="Unique username for login" example="johndoe"/>
+                <property name="password" type="string" description="User password (minimum 8 characters)" example="SecurePass123!"/>
+                <property name="email" type="string" format="email" description="User email address" example="john.doe@example.com"/>
+                <property name="phone" type="string" description="User phone number (international format)" example="+1234567890"/>
+                <property name="externalUserId" type="string" description="External user ID (optional)" example="ext_user_123"/>
+              </property>
+              <required>firstName,lastName,username,password</required>
+            </schema>
+          </parameter>
+        </parameters>
+        <responses>
+          <response code="200">
+            <description>User onboarded successfully</description>
+          </response>
+          <response code="400">
+            <description>Bad request - validation failed</description>
+          </response>
+          <response code="409">
+            <description>User already exists</description>
+          </response>
+          <response code="500">
+            <description>Internal server error</description>
+          </response>
+        </responses>
+      </post>
+    </path>
+    <path path="/api/wallet/login">
+      <post>
+        <summary>Login</summary>
+        <description>Authenticate user with username and password</description>
+        <operationId>login</operationId>
+        <consumes>
+          <consume>application/json</consume>
+        </consumes>
+        <produces>
+          <produce>application/json</produce>
+        </produces>
+        <parameters>
+          <parameter name="body" in="body" required="true" description="Login credentials">
+            <schema>
+              <type>object</type>
+              <properties>
+                <property name="username" type="string" description="Username" example="johndoe"/>
+                <property name="password" type="string" description="Password" example="SecurePass123!"/>
+              </property>
+              <required>username,password</required>
+            </schema>
+          </parameter>
+        </parameters>
+        <responses>
+          <response code="200">
+            <description>Login successful</description>
+          </response>
+          <response code="401">
+            <description>Invalid credentials</description>
+          </response>
+          <response code="400">
+            <description>Bad request</description>
+          </response>
+        </responses>
+      </post>
+    </path>
+    <path path="/api/wallet/login/verify">
+      <post>
+        <summary>Verify Login OTP</summary>
+        <description>Verify user login using OTP sent to registered phone number</description>
+        <operationId>verifyLogin</operationId>
+        <consumes>
+          <consume>application/json</consume>
+        </consumes>
+        <produces>
+          <produce>application/json</produce>
+        </produces>
+        <parameters>
+          <parameter name="body" in="body" required="true" description="OTP verification data">
+            <schema>
+              <type>object</type>
+              <properties>
+                <property name="sessionId" type="string" description="Session ID" example="session_123456"/>
+                <property name="otp" type="string" description="OTP code" example="123456"/>
+              </property>
+              <required>sessionId,otp</required>
+            </schema>
+          </parameter>
+        </parameters>
+        <responses>
+          <response code="200">
+            <description>Login verification successful</description>
+          </response>
+          <response code="401">
+            <description>Invalid OTP</description>
+          </response>
+          <response code="400">
+            <description>Bad request</description>
+          </response>
+        </responses>
+      </post>
+    </path>
+    <path path="/api/wallet/login/resend-otp">
+      <post>
+        <summary>Resend OTP</summary>
+        <description>Resend OTP to user's registered phone number</description>
+        <operationId>resendOtp</operationId>
+        <consumes>
+          <consume>application/json</consume>
+        </consumes>
+        <produces>
+          <produce>application/json</produce>
+        </produces>
+        <parameters>
+          <parameter name="body" in="body" required="true" description="Resend OTP data">
+            <schema>
+              <type>object</type>
+              <properties>
+                <property name="sessionId" type="string" description="Session ID" example="session_123456"/>
+              </property>
+              <required>sessionId</required>
+            </schema>
+          </parameter>
+        </parameters>
+        <responses>
+          <response code="200">
+            <description>OTP resent successfully</description>
+          </response>
+          <response code="400">
+            <description>Bad request</description>
+          </response>
+        </responses>
+      </post>
+    </path>
+    <path path="/api/wallet/{user_id}/vcs">
+      <get>
+        <summary>Get All VCs</summary>
+        <description>Retrieve all Verifiable Credentials for a specific user</description>
+        <operationId>getAllVCs</operationId>
+        <produces>
+          <produce>application/json</produce>
+        </produces>
+        <security>
+          <securityRequirement>
+            <requirement name="Bearer"/>
+          </securityRequirement>
+        </security>
+        <parameters>
+          <parameter name="user_id" in="path" required="true" type="string" description="User ID" example="ext_user_123"/>
+        </parameters>
+        <responses>
+          <response code="200">
+            <description>VCs retrieved successfully</description>
+          </response>
+          <response code="401">
+            <description>Unauthorized</description>
+          </response>
+          <response code="404">
+            <description>User not found</description>
+          </response>
+        </responses>
+      </get>
+    </path>
+    <path path="/api/wallet/{user_id}/vcs/{vcId}">
+      <get>
+        <summary>Get VC by ID</summary>
+        <description>Retrieve a specific Verifiable Credential by its ID</description>
+        <operationId>getVCById</operationId>
+        <produces>
+          <produce>application/json</produce>
+        </produces>
+        <security>
+          <securityRequirement>
+            <requirement name="Bearer"/>
+          </securityRequirement>
+        </security>
+        <parameters>
+          <parameter name="user_id" in="path" required="true" type="string" description="User ID" example="ext_user_123"/>
+          <parameter name="vcId" in="path" required="true" type="string" description="VC ID" example="vc_123"/>
+        </parameters>
+        <responses>
+          <response code="200">
+            <description>VC retrieved successfully</description>
+          </response>
+          <response code="401">
+            <description>Unauthorized</description>
+          </response>
+          <response code="404">
+            <description>VC not found</description>
+          </response>
+        </responses>
+      </get>
+    </path>
+    <path path="/api/wallet/{user_id}/vc_json/{vcIdentifier}">
+      <get>
+        <summary>Get VC JSON by Identifier</summary>
+        <description>Retrieve VC JSON data using VC identifier</description>
+        <operationId>getVCJsonByVcIdentifier</operationId>
+        <produces>
+          <produce>application/json</produce>
+        </produces>
+        <security>
+          <securityRequirement>
+            <requirement name="Bearer"/>
+          </securityRequirement>
+        </security>
+        <parameters>
+          <parameter name="user_id" in="path" required="true" type="string" description="User ID" example="ext_user_123"/>
+          <parameter name="vcIdentifier" in="path" required="true" type="string" description="VC Identifier" example="vc_identifier_123"/>
+        </parameters>
+        <responses>
+          <response code="200">
+            <description>VC JSON retrieved successfully</description>
+          </response>
+          <response code="401">
+            <description>Unauthorized</description>
+          </response>
+          <response code="404">
+            <description>VC not found</description>
+          </response>
+        </responses>
+      </get>
+    </path>
+    <path path="/api/wallet/{user_id}/vcs/upload-qr">
+      <post>
+        <summary>Upload VC from QR</summary>
+        <description>Upload a Verifiable Credential by scanning a QR code</description>
+        <operationId>uploadVCFromQR</operationId>
+        <consumes>
+          <consume>application/json</consume>
+        </consumes>
+        <produces>
+          <produce>application/json</produce>
+        </produces>
+        <security>
+          <securityRequirement>
+            <requirement name="Bearer"/>
+          </securityRequirement>
+        </security>
+        <parameters>
+          <parameter name="user_id" in="path" required="true" type="string" description="User ID" example="ext_user_123"/>
+          <parameter name="body" in="body" required="true" description="QR data">
+            <schema>
+              <type>object</type>
+              <properties>
+                <property name="qrData" type="string" description="QR code data" example="eyJ0eXBlIjoiVkMiLCJkYXRhIjoiZXhhbXBsZV9xcl9kYXRhIn0="/>
+              </property>
+              <required>qrData</required>
+            </schema>
+          </parameter>
+        </parameters>
+        <responses>
+          <response code="200">
+            <description>VC uploaded successfully</description>
+          </response>
+          <response code="401">
+            <description>Unauthorized</description>
+          </response>
+          <response code="400">
+            <description>Invalid QR data</description>
+          </response>
+        </responses>
+      </post>
+    </path>
+    <path path="/api/wallet/vcs/watch">
+      <post>
+        <summary>Watch VC</summary>
+        <description>Register a VC for monitoring updates and set up callback notifications</description>
+        <operationId>watchVC</operationId>
+        <consumes>
+          <consume>application/json</consume>
+        </consumes>
+        <produces>
+          <produce>application/json</produce>
+        </produces>
+        <security>
+          <securityRequirement>
+            <requirement name="Bearer"/>
+          </securityRequirement>
+        </security>
+        <parameters>
+          <parameter name="body" in="body" required="true" description="Watch VC data">
+            <schema>
+              <type>object</type>
+              <properties>
+                <property name="vcPublicId" type="string" description="Public ID of the Verifiable Credential to watch" example="abc123"/>
+                <property name="identifier" type="string" description="VC identifier" example="vc_identifier_123"/>
+                <property name="email" type="string" format="email" description="Email address for watcher notifications" example="watcher@example.com"/>
+                <property name="callbackUrl" type="string" format="uri" description="Callback URL for VC update notifications" example="https://your-app.com/callback"/>
+                <property name="forwardWatcherCallbackUrl" type="string" format="uri" description="Optional external URL to forward callback notifications to" example="https://external-service.com/webhook"/>
+              </property>
+              <required>vcPublicId</required>
+            </schema>
+          </parameter>
+        </parameters>
+        <responses>
+          <response code="200">
+            <description>VC watch registered successfully</description>
+          </response>
+          <response code="401">
+            <description>Unauthorized</description>
+          </response>
+          <response code="400">
+            <description>Bad request</description>
+          </response>
+        </responses>
+      </post>
+    </path>
+    <path path="/api/wallet/vcs/watch/callback">
+      <post>
+        <summary>VC Watch Callback (Webhook)</summary>
+        <description>Webhook endpoint for receiving VC update notifications from Dhiway</description>
+        <operationId>watchCallback</operationId>
+        <consumes>
+          <consume>application/json</consume>
+        </consumes>
+        <produces>
+          <produce>application/json</produce>
+        </produces>
+        <parameters>
+          <parameter name="body" in="body" required="true" description="Watch callback data">
+            <schema>
+              <type>object</type>
+              <properties>
+                <property name="recordPublicId" type="string" description="Public ID of the record being updated" example="abc123"/>
+                <property name="user_id" type="string" description="User ID associated with the callback" example="user_123"/>
+                <property name="status" type="string" description="Status of the VC update" example="updated"/>
+                <property name="timestamp" type="string" format="date-time" description="Timestamp of the callback" example="2023-12-01T12:00:00Z"/>
+                <property name="identifier" type="string" description="VC identifier" example="vc_identifier_123"/>
+                <property name="type" type="string" description="Type of the callback event" example="vc_updated"/>
+                <property name="message" type="string" description="Callback message or description" example="VC has been updated successfully"/>
+              </property>
+            </schema>
+          </parameter>
+        </parameters>
+        <responses>
+          <response code="200">
+            <description>Callback processed successfully</description>
+          </response>
+          <response code="400">
+            <description>Bad request</description>
+          </response>
+          <response code="500">
+            <description>Internal server error</description>
+          </response>
+        </responses>
+      </post>
+    </path>
+    <path path="/housekeeping/sync-vcs-and-add-watchers">
+      <post>
+        <summary>Sync VCs and Add Watchers (Protected)</summary>
+        <description>Sync VCs from provider and add watchers for all users</description>
+        <operationId>syncVCsAndAddWatchersForAllUsers</operationId>
+        <consumes>
+          <consume>application/json</consume>
+        </consumes>
+        <produces>
+          <produce>application/json</produce>
+        </produces>
+        <security>
+          <securityRequirement>
+            <requirement name="Bearer"/>
+          </securityRequirement>
+        </security>
+        <parameters>
+          <parameter name="provider" in="query" required="false" type="string" description="Provider name" example="dhiway"/>
+          <parameter name="chunkSize" in="query" required="false" type="integer" format="int32" description="Number of VCs to process in each batch" example="100"/>
+        </parameters>
+        <responses>
+          <response code="200">
+            <description>VCs synced and watchers added successfully</description>
+          </response>
+          <response code="401">
+            <description>Unauthorized</description>
+          </response>
+          <response code="500">
+            <description>Internal server error</description>
+          </response>
+        </responses>
+      </post>
+    </path>
+  </paths>
+  <securityDefinitions>
+    <securityDefinition name="Bearer" type="apiKey">
+      <name>Authorization</name>
+      <in>header</in>
+      <description>Enter JWT token</description>
+    </securityDefinition>
+  </securityDefinitions>
+  <tags>
+    <tag name="System" description="System health and monitoring endpoints"/>
+    <tag name="Authentication" description="User authentication and authorization endpoints"/>
+    <tag name="Wallet" description="Wallet operations and VC management"/>
+    <tag name="Housekeeping" description="System maintenance and monitoring"/>
+  </tags>
+</swagger>
