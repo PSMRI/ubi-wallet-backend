@@ -1,32 +1,57 @@
 name: Deploy to UBA-DEV
+
 on:
   workflow_dispatch:
-  push:  
+    inputs:
+      TAG:
+        description: 'Docker image tag to deploy'
+        required: true
+        default: 'latest'
+      BRANCH:
+        description: 'Git branch to deploy'
+        required: true
+        default: 'main'
+  push:
     branches:
-      - main    
+      - main
+
 jobs:
   Deploy_on_UBA_DEV:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     environment: UBA-DEV
-    steps:
-      - name: Deploy Stack via SSH
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.HOST_NAME }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          port: ${{ secrets.PORT }}
-          script: |    
-            cd ${{ secrets.TARGET_DIR }}
-            if [ -f .env ]; then
-              rm .env
-            fi
-            echo '${{ secrets.DEV_ENV }}' > .env
-            ls -ltra
-            ./deploy.sh
 
-      ## Notify on Slack
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.HOST_NAME }} >> ~/.ssh/known_hosts
+
+      - name: Deploy Stack via SSH
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.USERNAME }}@${{ secrets.HOST_NAME }} <<'ENDSSH'
+          export BASE_DIR="${{ secrets.TARGET_DIR }}"
+          export BRANCH="${{ github.event.inputs.BRANCH || 'main' }}"
+          export TAG="${{ github.event.inputs.TAG || 'latest' }}"
+          export REPO_NAME="ubi-wallet-backend"
+          export REPO_URL="https://github.com/PSMRI/ubi-wallet-backend.git"
+          export CONTAINER_NAME="ubi-wallet-backend"
+          
+          cd "$BASE_DIR"
+          
+          # Prepare .env
+          if [ -f .env ]; then rm .env; fi
+          echo '${{ secrets.DEV_ENV }}' > .env
+          
+          # Run deployment script
+          bash deploy.sh
+          ENDSSH
+
       - name: Notify on Slack channel
         uses: iRoachie/slack-github-actions@v2.3.2
         env:
