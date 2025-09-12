@@ -48,7 +48,7 @@ docker rmi "$REPO_NAME:latest" 2>/dev/null || true
 # ----- Start container -----
 if [ -f docker-compose.yml ]; then
     echo "🚀 Starting $CONTAINER_NAME service with docker-compose..."
-    docker compose up -d --build --force-recreate wallet-backend
+      docker compose up -d --build --force-recreate wallet-backend
 else
     echo "🚀 Running container $CONTAINER_NAME directly..."
     docker run -d --name "$CONTAINER_NAME" --env-file .env -p 3000:3000 "$IMAGE_NAME"
