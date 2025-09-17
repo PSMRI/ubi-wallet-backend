@@ -73,15 +73,15 @@ export class OnboardUserDto {
   email?: string;
 
   @ApiProperty({
-    description: 'User phone number (international format)',
-    example: '+1234567890',
+    description: 'User phone number (10 digits only)',
+    example: '9876543210',
     required: false,
-    pattern: '^\\+[1-9]\\d{1,14}$',
+    pattern: '^\\d{10}$',
   })
-  @IsString()
   @IsOptional()
-  @Matches(/^\+[1-9]\d{1,14}$/, {
-    message: 'Phone number must be in international format (e.g., +1234567890)',
+  @IsString()
+  @Matches(/^\d{10}$/, {
+    message: 'Phone number must be exactly 10 digits (e.g., 9876543210)',
   })
   phone?: string;
 }
