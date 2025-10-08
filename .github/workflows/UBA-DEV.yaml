@@ -1,19 +1,9 @@
 name: Deploy to UBA-DEV
 
 on:
-  workflow_dispatch:
-    inputs:
-      TAG:
-        description: 'Docker image tag to deploy'
-        required: true
-        default: 'latest'
-      BRANCH:
-        description: 'Git branch to deploy'
-        required: true
-        default: 'main'
   push:
     branches:
-      - main
+      - '*'  # Trigger on any branch push
 
 jobs:
   Deploy_on_UBA_DEV:
@@ -35,21 +25,32 @@ jobs:
       - name: Deploy Stack via SSH
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.USERNAME }}@${{ secrets.HOST_NAME }} <<'ENDSSH'
+          echo "🚀 Starting deployment..."
+
+          # ----- Environment variables -----
           export BASE_DIR="${{ secrets.TARGET_DIR }}"
-          export BRANCH="${{ github.event.inputs.BRANCH || 'main' }}"
-          export TAG="${{ github.event.inputs.TAG || 'latest' }}"
           export REPO_NAME="ubi-wallet-backend"
           export REPO_URL="https://github.com/PSMRI/ubi-wallet-backend.git"
+          export SERVICE_NAME="ubi-wallet-backend"
           export CONTAINER_NAME="ubi-wallet-backend"
+          export TAG="latest"
           
-          cd "$BASE_DIR"
-          
-          # Prepare .env
+          # Determine branch dynamically from push event
+          BRANCH="${GITHUB_REF#refs/heads/}"
+          echo "Deploying branch: $BRANCH"
+
+          # ----- Change to base directory -----
+          cd "$BASE_DIR" || exit 1
+
+          # ----- Prepare .env -----
           if [ -f .env ]; then rm .env; fi
-          echo '${{ secrets.DEV_ENV }}' > .env
-          
-          # Run deployment script
-          bash deploy.sh
+          echo '${{ secrets.ENV }}' > .env
+
+          # ----- Ensure deploy.sh is executable -----
+          chmod +x deploy.sh
+
+          # ----- Run deploy.sh with environment variables -----
+          BRANCH="$BRANCH" SERVICE_NAME="$SERVICE_NAME" TAG="$TAG" REPO_NAME="$REPO_NAME" REPO_URL="$REPO_URL" CONTAINER_NAME="$CONTAINER_NAME" ./deploy.sh
           ENDSSH
 
       - name: Notify on Slack channel
