@@ -29,7 +29,7 @@ jobs:
             export TAG="latest"
           
             # Determine branch dynamically from push event
-            BRANCH="${GITHUB_REF#refs/heads/}"
+            BRANCH="${{ github.ref_name }}"
             echo "Deploying branch: $BRANCH"
             # ----- Change to base directory -----
             cd "$BASE_DIR" || exit 1
