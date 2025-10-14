@@ -23,7 +23,8 @@ jobs:
 
       - name: Build and Push Docker Image
         env:
-          IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/ubi-wallet-backend
+        #  IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/ubi-wallet-backend
+          IMAGE_NAME: $(echo "ghcr.io/${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
           TAG: ${{ github.event.inputs.tag }}
         run: |
           echo "Building image: $IMAGE_NAME:$TAG"
