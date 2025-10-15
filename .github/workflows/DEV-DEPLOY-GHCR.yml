@@ -1,4 +1,4 @@
-name: Deploy to UBA-DEV Image
+name: Deploy to UBA-DEV (Tag-Based)
 
 on:
   workflow_dispatch:
@@ -12,18 +12,15 @@ jobs:
   deploy_on_uba_dev:
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    environment: UBA-DEV  # 👈 Secrets come from this environment
+    environment: UBA-DEV  # uses environment secrets
 
     steps:
       - name: Set environment variables
-        id: vars
         run: |
           IMAGE_NAME=$(echo "ghcr.io/${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
           TAG="${{ github.event.inputs.tag }}"
-          echo "IMAGE_NAME=$IMAGE_NAME" >> $GITHUB_ENV
-          echo "TAG=$TAG" >> $GITHUB_ENV
           echo "IMAGE_URI=$IMAGE_NAME:$TAG" >> $GITHUB_ENV
-          echo "📦 Image to deploy: $IMAGE_NAME:$TAG"
+          echo "📦 Deploying image: $IMAGE_NAME:$TAG"
 
       - name: Deploy to UBA-DEV server
         uses: appleboy/ssh-action@v0.1.9
@@ -35,16 +32,19 @@ jobs:
           script: |
             set -e
             echo "🚀 Starting deployment to UBA-DEV environment"
-            
+
             IMAGE_URI="${{ env.IMAGE_URI }}"
             CONTAINER_NAME="ubi-wallet-backend"
             BASE_DIR="${{ secrets.TARGET_DIR }}"
             ENV_FILE="${BASE_DIR}/.env"
 
+            echo "🔐 Logging in to GHCR..."
+            echo "${{ secrets.GHCR_PAT_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
             echo "📦 Pulling image from GHCR: $IMAGE_URI"
             docker pull "$IMAGE_URI"
 
-            echo "🛑 Stopping and removing existing container if running..."
+            echo "🛑 Stopping existing container (if any)..."
             docker rm -f "$CONTAINER_NAME" || true
 
             echo "🚀 Starting new container..."
@@ -54,7 +54,7 @@ jobs:
               -p 80:80 \
               "$IMAGE_URI"
 
-            echo "✅ Deployment complete! Showing running containers:"
+            echo "✅ Deployment complete!"
             docker ps | grep "$CONTAINER_NAME"
 
       - name: Notify on Slack
