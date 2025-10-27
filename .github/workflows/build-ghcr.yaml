@@ -14,6 +14,11 @@ jobs:
     timeout-minutes: 15
     environment: GHCR_BUILD
 
+    permissions:
+      contents: read
+      packages: write   # Required to push to GHCR
+      id-token: write   # Required for gh api command
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -26,20 +31,28 @@ jobs:
           # Dynamically create lowercase image name
           IMAGE_NAME=$(echo "ghcr.io/${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
           TAG="${{ github.event.inputs.tag }}"
-
-          echo "Building image: $IMAGE_NAME:$TAG"
+          echo "🏗️ Building image: $IMAGE_NAME:$TAG"
           docker build -t "$IMAGE_NAME:$TAG" .
-
-          echo "Tagging image as latest"
+          echo "🏷️ Tagging image as latest"
           docker tag "$IMAGE_NAME:$TAG" "$IMAGE_NAME:latest"
-
-          echo "Pushing image: $IMAGE_NAME:$TAG"
+          echo "📤 Pushing image: $IMAGE_NAME:$TAG"
           docker push "$IMAGE_NAME:$TAG"
-
-          echo "Pushing image: $IMAGE_NAME:latest"
+          echo "📤 Pushing image: $IMAGE_NAME:latest"
           docker push "$IMAGE_NAME:latest"
-
           echo "$IMAGE_NAME:$TAG" > image.txt
+
+      - name: Set GHCR image visibility to public
+        env:
+          GITHUB_TOKEN: ${{ secrets.GHCR_PAT_TOKEN }}
+        run: |
+          IMAGE_NAME=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]' | cut -d'/' -f2)
+          echo "🌐 Setting visibility of $IMAGE_NAME to public..."
+          gh api \
+            -X PATCH \
+            -H "Accept: application/vnd.github+json" \
+            "/user/packages/container/$IMAGE_NAME/visibility" \
+            -f visibility=public
+          echo "✅ Visibility set to public."
 
       - name: Upload Image URI
         uses: actions/upload-artifact@v4
