@@ -16,8 +16,8 @@ jobs:
 
     permissions:
       contents: read
-      packages: write   # Required to push to GHCR
-      id-token: write   # Required for gh api command
+      packages: write
+      id-token: write
 
     steps:
       - name: Checkout code
@@ -45,13 +45,16 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GHCR_PAT_TOKEN }}
         run: |
-          IMAGE_NAME=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]' | cut -d'/' -f2)
-          echo "🌐 Setting visibility of $IMAGE_NAME to public..."
+          ORG_NAME=$(echo "${{ github.repository }}" | cut -d'/' -f1 | tr '[:upper:]' '[:lower:]')
+          IMAGE_NAME=$(echo "${{ github.repository }}" | cut -d'/' -f2 | tr '[:upper:]' '[:lower:]')
+          echo "🌐 Setting visibility of $ORG_NAME/$IMAGE_NAME to public..."
+          
           gh api \
             -X PATCH \
             -H "Accept: application/vnd.github+json" \
-            "/user/packages/container/$IMAGE_NAME/visibility" \
+            "/orgs/$ORG_NAME/packages/container/$IMAGE_NAME/visibility" \
             -f visibility=public
+          
           echo "✅ Visibility set to public."
 
       - name: Upload Image URI
