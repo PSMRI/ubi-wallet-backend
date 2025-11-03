@@ -7,9 +7,9 @@ on:
   workflow_dispatch:
     inputs:
       environment:
-        description: "Target environment (qa or prod)"
+        description: "Target environment (Roadmap or Pilot)"
         required: true
-        default: "qa"
+        default: "Roadmap"
       tag:
         description: "Docker tag to use (e.g., v1.0.4)"
         required: true
@@ -22,7 +22,7 @@ jobs:
     timeout-minutes: 15
 
     # Pick environment dynamically
-    environment: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || 'qa' }}
+    environment: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || 'Roadmap' }}
 
     permissions:
       contents: read
@@ -30,7 +30,7 @@ jobs:
       id-token: write
 
     env:
-      ENVIRONMENT: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || 'qa' }}
+      ENVIRONMENT: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || 'Roadmap' }}
       TAG: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag || github.ref_name }}
 
     steps:
