@@ -1,23 +1,37 @@
-name: Build and Push to GHCR (UBA-DEV)
+name: Tag-based Build and Push to GHCR
 
 on:
+  push:
+    tags:
+      - "v*"
   workflow_dispatch:
     inputs:
-      tag:
-        description: 'Docker tag to use (e.g., v1.0.4)'
+      environment:
+        description: "Target environment (qa or prod)"
         required: true
-        default: 'v1.0.1'
+        default: "qa"
+      tag:
+        description: "Docker tag to use (e.g., v1.0.4)"
+        required: true
+        default: "v1.0.1"
 
 jobs:
   build_and_push:
+    name: Build and Push Docker Image to GHCR
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    environment: GHCR_BUILD
+
+    # Pick environment dynamically
+    environment: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || 'qa' }}
 
     permissions:
       contents: read
       packages: write
       id-token: write
+
+    env:
+      ENVIRONMENT: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || 'qa' }}
+      TAG: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag || github.ref_name }}
 
     steps:
       - name: Checkout code
@@ -28,9 +42,8 @@ jobs:
 
       - name: Build and Push Docker Image
         run: |
-          # Dynamically create lowercase image name
           IMAGE_NAME=$(echo "ghcr.io/${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
-          TAG="${{ github.event.inputs.tag }}"
+          TAG="${{ env.TAG }}"
           echo "🏗️ Building image: $IMAGE_NAME:$TAG"
           docker build -t "$IMAGE_NAME:$TAG" .
           echo "🏷️ Tagging image as latest"
@@ -50,7 +63,6 @@ jobs:
           echo "🌐 Attempting to set visibility for $ORG_NAME/$IMAGE_NAME..."
 
           set +e
-          # Try organization endpoint first
           gh api -X PATCH -H "Accept: application/vnd.github+json" \
             "/orgs/$ORG_NAME/packages/container/$IMAGE_NAME/visibility" \
             -f visibility=public
