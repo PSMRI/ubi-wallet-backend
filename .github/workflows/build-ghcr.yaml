@@ -7,9 +7,9 @@ on:
   workflow_dispatch:
     inputs:
       environment:
-        description: "Target environment (Roadmap or Pilot)"
+        description: "Target environment (UBA-DEV or UBA-DEPWD-PILOT)"
         required: true
-        default: "Roadmap"
+        default: "UBA-DEV"
       tag:
         description: "Docker tag to use (e.g., v1.0.4)"
         required: true
@@ -22,7 +22,7 @@ jobs:
     timeout-minutes: 15
 
     # Pick environment dynamically
-    environment: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || 'Roadmap' }}
+    environment: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || 'UBA-DEV' }}
 
     permissions:
       contents: read
@@ -30,7 +30,7 @@ jobs:
       id-token: write
 
     env:
-      ENVIRONMENT: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || 'Roadmap' }}
+      ENVIRONMENT: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || 'UBA-DEV' }}
       TAG: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag || github.ref_name }}
 
     steps:
